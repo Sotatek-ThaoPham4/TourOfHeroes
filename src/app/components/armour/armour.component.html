@@ -1,0 +1,15 @@
+<section class="armours">
+  <h2>My Armours</h2>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Health</th>
+    </tr>
+    <tr *ngFor="let armour of armours">
+      <td>{{armour.id}}</td>
+      <td>{{armour.name}}</td>
+      <td>{{armour.health}}</td>
+    </tr>
+  </table>
+</section>

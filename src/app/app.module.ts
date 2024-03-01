@@ -9,6 +9,8 @@ import { HeroesComponent } from './components/heroes/heroes.component';
 import { MessagesComponent } from './components/messages/messages.component';
 
 import { AppRoutingModule } from './app-routing.module';
+import { ArmourComponent } from './components/armour/armour.component';
+import { WeaponsComponent } from './components/weapons/weapons.component';
 
 @NgModule({
   imports: [
@@ -21,7 +23,9 @@ import { AppRoutingModule } from './app-routing.module';
     DashboardComponent,
     HeroesComponent,
     HeroDetailComponent,
-    MessagesComponent
+    MessagesComponent,
+    ArmourComponent,
+    WeaponsComponent
   ],
   bootstrap: [ AppComponent ]
 })
