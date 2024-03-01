@@ -14,10 +14,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public canvas!: HTMLCanvasElement;
   public stage!: Konva.Stage;
   public layer!: Konva.Layer;
-  public canvasHeroes: Hero[] = [];
+  public canvasHeroes: { hero: Hero, initialPosition: { x: number, y: number }, position: { x: number, y: number } }[] = [];
   public battleCompleted = false;
   public battleMessage = '';
   public intervalId: any;
+  public battleInProgress = false;
   protected _subscription: Subscription;
 
   constructor(private __heroService: HeroService) {
@@ -47,32 +48,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   public toggleHero(hero: Hero): void {
-    const index = this.canvasHeroes.findIndex(h => h.id === hero.id);
+    const index = this.canvasHeroes.findIndex(h => h.hero.id === hero.id);
     if (index !== -1) {
       this.canvasHeroes.splice(index, 1);
       this.redrawCanvas();
     } else {
-      this.canvasHeroes.push(hero);
-      this.drawHero(hero);
+      const initialPosition = { x: Math.random() * 600, y: Math.random() * 450 };
+      this.canvasHeroes.push({ hero, initialPosition, position: { ...initialPosition } });
+      this.drawHero(hero, initialPosition);
     }
   }
 
   private redrawCanvas(): void {
     this.layer.destroyChildren();
-    this.canvasHeroes.forEach(hero => {
-      this.drawHero(hero);
+    this.canvasHeroes.forEach(heroData => {
+      this.drawHero(heroData.hero, heroData.position);
     });
     this.layer.batchDraw();
   }
 
-  private drawHero(hero: Hero): void {
+  private drawHero(hero: Hero, position: { x: number, y: number }): void {
     const imageObj = new Image();
     imageObj.src = hero.imageSrc;
     imageObj.onload = () => {
       const konvaImage = new Konva.Image({
         image: imageObj,
-        x: Math.random() * 600,
-        y: Math.random() * 450,
+        x: position.x,
+        y: position.y,
         width: 150,
         height: 150,
         draggable: true
@@ -91,15 +93,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
   }
 
-  private changeWeapon(hero: Hero ): void {
-
+  private changeWeapon(hero: Hero): void {
+    // Implement your logic for changing weapon here
   }
 
   public startBattle(): void {
+    if (this.intervalId || this.battleCompleted) {
+      clearInterval(this.intervalId);
+    }
+    this.battleCompleted = false;
+    this.battleInProgress = true;
+
     this.intervalId = setInterval(() => {
       this.attack();
       if (this.battleCompleted) {
         clearInterval(this.intervalId);
+        this.battleInProgress = false;
       }
     }, 1000);
   }
@@ -110,12 +119,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
     this.battleMessage = 'Battle is ongoing...';
-    this.canvasHeroes.forEach(attacker => {
-      this.canvasHeroes.forEach(target => {
+
+    this.canvasHeroes.forEach(attackerData => {
+      const attacker = attackerData.hero;
+      this.canvasHeroes.forEach(targetData => {
+        const target = targetData.hero;
         if (attacker.id !== target.id) {
           target.health -= attacker.weapon.damage;
           if (target.health <= 0) {
-            const index = this.canvasHeroes.findIndex(hero => hero.id === target.id);
+            const index = this.canvasHeroes.findIndex(heroData => heroData.hero.id === target.id);
             this.canvasHeroes.splice(index, 1);
             this.redrawCanvas();
             if (this.canvasHeroes.length === 1) {
