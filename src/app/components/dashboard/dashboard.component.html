@@ -1,7 +1,20 @@
-<h2>Top Heroes</h2>
-<div class="heroes-menu">
-  <a *ngFor="let hero of heroes"
-    routerLink="/detail/{{hero.id}}">
-    {{hero.name}}
-  </a>
-</div>
+<section>
+  <h2>My Heroes</h2>
+  <div class="heroes-menu">
+    <a *ngFor="let hero of heroes" (click)="toggleHero(hero)">
+      {{hero.name}}
+    </a>
+  </div>
+</section>
+
+<!-- Add canvas element -->
+<section class="heroes-canvas">
+  <div id="container"></div>
+</section>
+
+<section class="heroes-attack">
+  <button (click)="startBattle()">Start battle</button>
+  <p *ngIf="battleMessage">{{battleMessage}}</p>
+</section>
+
+
