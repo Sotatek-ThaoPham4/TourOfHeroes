@@ -48,3 +48,21 @@ a {
 a:hover {
   background-color: #000;
 }
+
+.heroes-canvas {
+    margin-top: 50px;
+}
+
+.heroes-attack {
+    text-align: center;
+    margin-top: 20px;
+p {
+    color: red;
+}
+}
+
+#container {
+    border: 1px solid black;
+    max-width: 750px;
+    margin: auto;
+}
