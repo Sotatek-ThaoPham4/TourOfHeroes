@@ -1,0 +1,28 @@
+<section class="heroes">
+  <h2>My Heroes</h2>
+  <div class="heroes__table">
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Health</th>
+        <th>Weapon</th>
+        <th>Armour</th>
+      </tr>
+      <tr *ngFor="let hero of heroes">
+        <td>{{hero.id}}</td>
+        <td>
+          <div class="heroes__name">
+            <img [src]="hero.imageSrc" class="image" alt="hero image">
+            <span class="name">{{hero.name}}</span>
+          </div>
+        </td>
+        <!--hero.health + armour.health-->
+        <td>{{hero.health + hero.armour.health}}</td>
+        <td>{{hero.weapon.name}}</td>
+        <td>{{hero.armour.name}}</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
