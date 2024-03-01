@@ -19,6 +19,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public battleMessage = '';
   public intervalId: any;
   public battleInProgress = false;
+  public konvaImagesMap: Map<number, Konva.Image> = new Map<number, Konva.Image>();
   protected _subscription: Subscription;
 
   constructor(private __heroService: HeroService) {
@@ -80,14 +81,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         draggable: true
       });
 
-      if (hero.health < 50) {
-        konvaImage.stroke('red');
-        konvaImage.strokeWidth(5);
-      }
-
       konvaImage.on('click', () => {
         this.changeWeapon(hero);
       });
+
+      this.konvaImagesMap.set(hero.id, konvaImage);
+
       this.layer.add(konvaImage);
       this.layer.batchDraw();
     };
@@ -118,26 +117,54 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.battleMessage = 'You need at least 2 heroes on the stage to start the attack';
       return;
     }
-    this.battleMessage = 'Battle is ongoing...';
 
+    this.battleMessage = 'Battle is ongoing...';
+    let heroRemoved = false;
+    const heroesWithLowHealth: Hero[] = [];
+
+    // Apply damage and check for heroes with low health
     this.canvasHeroes.forEach(attackerData => {
       const attacker = attackerData.hero;
       this.canvasHeroes.forEach(targetData => {
         const target = targetData.hero;
         if (attacker.id !== target.id) {
           target.health -= attacker.weapon.damage;
-          if (target.health <= 0) {
+          if (target.health <= 0 && !heroRemoved) {
+            heroRemoved = true;
             const index = this.canvasHeroes.findIndex(heroData => heroData.hero.id === target.id);
             this.canvasHeroes.splice(index, 1);
-            this.redrawCanvas();
+            const konvaImage = this.konvaImagesMap.get(target.id);
+            if (konvaImage) {
+              konvaImage.destroy();
+              this.konvaImagesMap.delete(target.id);
+            }
             if (this.canvasHeroes.length === 1) {
               this.battleCompleted = true;
             }
+          } else if (target.health < 50 && !heroesWithLowHealth.includes(target)) {
+            heroesWithLowHealth.push(target);
           }
         }
       });
     });
 
+    // Update the red border for remaining heroes with health below 50
+    this.canvasHeroes.forEach(heroData => {
+      const hero = heroData.hero;
+      const konvaImage = this.konvaImagesMap.get(hero.id);
+      if (konvaImage) {
+        if (heroesWithLowHealth.includes(hero)) {
+          konvaImage.stroke('red');
+          konvaImage.strokeWidth(5);
+        } else {
+          konvaImage.stroke('');
+        }
+      }
+    });
+
+    this.layer.batchDraw();
+
+    // Check if the battle is completed
     if (this.battleCompleted) {
       this.battleMessage = 'Battle is completed';
     }
