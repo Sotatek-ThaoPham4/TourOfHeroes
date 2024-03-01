@@ -13,7 +13,7 @@
 </section>
 
 <section class="heroes-attack">
-  <button (click)="startBattle()">Start battle</button>
+  <button [disabled]="battleInProgress" (click)="startBattle()">Start battle</button>
   <p *ngIf="battleMessage">{{battleMessage}}</p>
 </section>
 
