@@ -1,0 +1,15 @@
+<section class="weapons">
+  <h2>My Weapons</h2>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Damage</th>
+    </tr>
+    <tr *ngFor="let weapon of weapons">
+      <td>{{weapon.id}}</td>
+      <td>{{weapon.name}}</td>
+      <td>{{weapon.damage}}</td>
+    </tr>
+  </table>
+</section>
